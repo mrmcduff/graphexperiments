@@ -1,8 +1,9 @@
 import { ChartData } from "./types";
 
-const valuesControl: number[] = Array.from({length: 48}, () => +(Math.random() * 10).toFixed(2));
-const valuesTreatment: number[] = Array.from({length: 48}, () => +(Math.random() * 10).toFixed(2));
-const valuesOtherTreatment: number[] = Array.from({length: 48}, () => +(Math.random() * 10).toFixed(2));
+const DATA_POINTS = 96;
+const valuesControl: number[] = Array.from({length: DATA_POINTS}, () => +(Math.random() * 10).toFixed(2));
+const valuesTreatment: number[] = Array.from({length: DATA_POINTS}, () => +(Math.random() * 10).toFixed(2));
+const valuesOtherTreatment: number[] = Array.from({length: DATA_POINTS}, () => +(Math.random() * 10).toFixed(2));
 
 function zip(dates: Date[], values: number[]): ChartData.VariantDataPoint[] {
     return dates.map((aVal, aInd) => {
@@ -13,71 +14,32 @@ function zip(dates: Date[], values: number[]): ChartData.VariantDataPoint[] {
     });
 }
 
-const dates: Date[] = [
-    new Date("2019-01-01T00:00:00.000Z"),
-    new Date("2019-01-01T00:01:00.000Z"),
-    new Date("2019-01-01T00:02:00.000Z"),
-    new Date("2019-01-01T00:03:00.000Z"),
-    new Date("2019-01-01T00:04:00.000Z"),
-    new Date("2019-01-01T00:05:00.000Z"),
-    new Date("2019-01-01T00:06:00.000Z"),
-    new Date("2019-01-01T00:07:00.000Z"),
-    new Date("2019-01-01T00:08:00.000Z"),
-    new Date("2019-01-01T00:09:00.000Z"),
-    new Date("2019-01-01T00:10:00.000Z"),
-    new Date("2019-01-01T00:11:00.000Z"),
-    new Date("2019-01-01T00:12:00.000Z"),
-    new Date("2019-01-01T00:13:00.000Z"),
-    new Date("2019-01-01T00:14:00.000Z"),
-    new Date("2019-01-01T00:15:00.000Z"),
-    new Date("2019-01-01T00:16:00.000Z"),
-    new Date("2019-01-01T00:17:00.000Z"),
-    new Date("2019-01-01T00:18:00.000Z"),
-    new Date("2019-01-01T00:19:00.000Z"),
-    new Date("2019-01-01T00:20:00.000Z"),
-    new Date("2019-01-01T00:21:00.000Z"),
-    new Date("2019-01-01T00:22:00.000Z"),
-    new Date("2019-01-01T00:23:00.000Z"),
-    new Date("2019-01-01T00:24:00.000Z"),
-    new Date("2019-01-01T00:25:00.000Z"),
-    new Date("2019-01-01T00:26:00.000Z"),
-    new Date("2019-01-01T00:27:00.000Z"),
-    new Date("2019-01-01T00:28:00.000Z"),
-    new Date("2019-01-01T00:29:00.000Z"),
-    new Date("2019-01-01T00:30:00.000Z"),
-    new Date("2019-01-01T00:31:00.000Z"),
-    new Date("2019-01-01T00:32:00.000Z"),
-    new Date("2019-01-01T00:33:00.000Z"),
-    new Date("2019-01-01T00:34:00.000Z"),
-    new Date("2019-01-01T00:35:00.000Z"),
-    new Date("2019-01-01T00:36:00.000Z"),
-    new Date("2019-01-01T00:37:00.000Z"),
-    new Date("2019-01-01T00:38:00.000Z"),
-    new Date("2019-01-01T00:39:00.000Z"),
-    new Date("2019-01-01T00:40:00.000Z"),
-    new Date("2019-01-01T00:41:00.000Z"),
-    new Date("2019-01-01T00:42:00.000Z"),
-    new Date("2019-01-01T00:43:00.000Z"),
-    new Date("2019-01-01T00:44:00.000Z"),
-    new Date("2019-01-01T00:45:00.000Z"),
-    new Date("2019-01-01T00:46:00.000Z"),
-    new Date("2019-01-01T00:47:00.000Z"),
+function toTimeFragment(k: number): string {
+    if (k < 0 || k >= 3600) {
+        return '00:00';
+    }
+    const hours = Math.floor(k / 60);
+    const hoursString = hours < 10 ? `0${hours}` : `${hours}`;
+    const minutes = k % 60;
+    const minutesString = minutes < 10 ? `0${minutes}` : `${minutes}`;
+    return `${hoursString}:${minutesString}`;
+}
 
-];
+const flexDates = Array.from({length: DATA_POINTS}, (v, k) => new Date(`2019-01-01T${toTimeFragment(k)}:00.000Z`));
 
 const controlVariantData: ChartData.VariantData = {
     name: 'control',
-    data: zip(dates, valuesControl),
+    data: zip(flexDates, valuesControl),
 }
 
 const treatmentVariantData: ChartData.VariantData = {
     name: 'treatment',
-    data: zip(dates, valuesTreatment),
+    data: zip(flexDates, valuesTreatment),
 }
 
 const otherTreatmentVariantData: ChartData.VariantData = {
     name: 'treatment2',
-    data: zip(dates, valuesOtherTreatment),
+    data: zip(flexDates, valuesOtherTreatment),
 };
 
 export const SampleData: ChartData.MetricData = {

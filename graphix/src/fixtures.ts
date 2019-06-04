@@ -1,4 +1,5 @@
 import { ChartData } from "./types";
+import { string } from "prop-types";
 
 const DATA_POINTS = 96;
 const valuesControl: number[] = Array.from({length: DATA_POINTS}, () => +(Math.random() * 10).toFixed(2));
@@ -66,3 +67,66 @@ export const COLOR_VIOLET = '#785EF0';
 colormap.set('control', COLOR_VIOLET);
 colormap.set('treatment', COLOR_GREEN);
 colormap.set('treatment2', COLOR_DESERT);
+const COLORS = [
+    COLOR_VIOLET,
+    COLOR_GREEN,
+    COLOR_DESERT,
+    COLOR_SKY,
+    COLOR_ROSE,
+    COLOR_ORANGE,
+    COLOR_ULTRAMARINE,
+    COLOR_SUNSHINE,
+    COLOR_AQUA]
+
+function generateColorMap(names: string[]): Map<string, string> {
+    const colorMap = new Map<string, string>();
+    names.forEach((name, index) => {
+        colorMap.set(name, COLORS[index % COLORS.length]);
+    });
+    return colorMap;
+}
+
+function generateNames(numVariants: number) : string[] {
+    if (numVariants < 1) {
+        return [];
+    }
+    const names = ['control'];
+    for (let i = 1; i < numVariants; i++) {
+        names.push(`treatment_${i}`);
+    }
+    return names;
+}
+
+function generateDates(numPoints: number): Date[] {
+    if (numPoints < 1 || numPoints >= 3600) {
+        return [];
+    }
+    return Array.from({length: numPoints}, (_, k) => new Date(`2019-01-01T${toTimeFragment(k)}:00.000Z`));
+}
+
+function generateValues(numPoints: number, rangeMultiplier: number): number[] {
+    if (numPoints < 1 || numPoints >= 3600) {
+        return [];
+    }
+    return Array.from({length: numPoints}, () => +(Math.random() * rangeMultiplier).toFixed(2));
+};
+
+export function generateDataSet(
+    numVariants: number,
+    numPoints: number,
+    rangeMultiplier: number) : [ChartData.MetricData, Map<string, string>] {
+    const names = generateNames(numVariants);
+    const dates = generateDates(numPoints);
+    if (names.length === 0 || dates.length === 0) {
+        return [{}, new Map<string, string>()];
+    }
+    const metricData = {};
+    names.forEach(name => {
+        const variantData: ChartData.VariantData = {
+            name,
+            data: zip(dates, generateValues(numPoints, rangeMultiplier)),
+        }
+        metricData[name] = variantData;
+    });
+    return [metricData, generateColorMap(names)];
+}

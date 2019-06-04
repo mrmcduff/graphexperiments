@@ -2,22 +2,29 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { TimeSeries } from './TimeSeries';
-import { SampleData, colormap, SampleTriData } from 'fixtures';
+import { SampleData, colormap, SampleTriData, generateDataSet } from 'fixtures';
 
 const App: React.FC = () => {
-
+    const [twoMetricData, twoColorMap] = generateDataSet(2, 96, 6);
+    const [threeMetricData, threeColorMap] = generateDataSet(3, 128, 1);
+    const [sixMetricData, sixColorMap] = generateDataSet(6, 64, 3);
   return (
     <div className="App">
         <div className='leftPanel'>
             <TimeSeries
-                metricData = {SampleData}
+                metricData = {twoMetricData}
                 metricName = 'things_per_second'
-                colorMap={colormap}
+                colorMap={twoColorMap}
             />
             <TimeSeries
-                metricData = {SampleTriData}
+                metricData = {threeMetricData}
                 metricName = 'more_things_per_second'
-                colorMap={colormap}
+                colorMap={threeColorMap}
+            />
+            <TimeSeries
+                metricData = {sixMetricData}
+                metricName = 'more_things_per_second'
+                colorMap={sixColorMap}
             />
         </div>
     </div>

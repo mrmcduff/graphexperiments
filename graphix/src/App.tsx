@@ -1,8 +1,7 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { TimeSeries } from './TimeSeries';
-import { SampleData, colormap, SampleTriData, generateDataSet } from 'fixtures';
+import { generateDataSet } from 'dataGenerator';
 
 const App: React.FC = () => {
     const [twoMetricData, twoColorMap] = generateDataSet(2, 96, 6);

@@ -1,5 +1,4 @@
-import { ChartData } from "./types";
-import { string } from "prop-types";
+import { ChartData, SimpleChartData } from "./types";
 
 const DATA_POINTS = 96;
 const valuesControl: number[] = Array.from({length: DATA_POINTS}, () => +(Math.random() * 10).toFixed(2));
@@ -13,6 +12,15 @@ function zip(dates: Date[], values: number[]): ChartData.VariantDataPoint[] {
         y: values[aInd]
       }
     });
+}
+
+function numZip(dates: number[], values: number[]): SimpleChartData.VariantDataPoint[] {
+    return dates.map((aVal, aInd) => {
+        return {
+          x: aVal,
+          y: values[aInd]
+        }
+      });
 }
 
 function toTimeFragment(k: number): string {
@@ -126,6 +134,29 @@ export function generateDataSet(
             name,
             data: zip(dates, generateValues(numPoints, rangeMultiplier)),
         }
+        metricData[name] = variantData;
+    });
+    return [metricData, generateColorMap(names)];
+}
+
+export function generateSimpleDataSet(
+    numVariants: number,
+    numPoints: number,
+    rangeMultiplier: number) : [SimpleChartData.MetricData, Map<string, string>] {
+    const names = generateNames(numVariants);
+    const rawDates = generateDates(numPoints);
+    if (names.length === 0 || rawDates.length === 0) {
+        return [{}, new Map<string, string>()];
+    }
+    const dates = rawDates.map(date => date.getTime());
+    console.log(dates);
+    const metricData = {};
+    names.forEach(name => {
+        const variantData: SimpleChartData.VariantData = {
+            name,
+            data: numZip(dates, generateValues(numPoints, rangeMultiplier)),
+        }
+        console.log(variantData);
         metricData[name] = variantData;
     });
     return [metricData, generateColorMap(names)];

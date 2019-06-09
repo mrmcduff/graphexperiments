@@ -1,17 +1,16 @@
 import { ChartData } from "./types";
-import { string } from "prop-types";
 
 const DATA_POINTS = 96;
-const valuesControl: number[] = Array.from({length: DATA_POINTS}, () => +(Math.random() * 10).toFixed(2));
-const valuesTreatment: number[] = Array.from({length: DATA_POINTS}, () => +(Math.random() * 10).toFixed(2));
-const valuesOtherTreatment: number[] = Array.from({length: DATA_POINTS}, () => +(Math.random() * 10).toFixed(2));
+const valuesControl: number[] = Array.from({ length: DATA_POINTS }, () => +(Math.random() * 10).toFixed(2));
+const valuesTreatment: number[] = Array.from({ length: DATA_POINTS }, () => +(Math.random() * 10).toFixed(2));
+const valuesOtherTreatment: number[] = Array.from({ length: DATA_POINTS }, () => +(Math.random() * 10).toFixed(2));
 
 function zip(dates: Date[], values: number[]): ChartData.VariantDataPoint[] {
     return dates.map((aVal, aInd) => {
-      return {
-        x: aVal,
-        y: values[aInd]
-      }
+        return {
+            x: aVal,
+            y: values[aInd]
+        }
     });
 }
 
@@ -26,7 +25,7 @@ function toTimeFragment(k: number): string {
     return `${hoursString}:${minutesString}`;
 }
 
-const flexDates = Array.from({length: DATA_POINTS}, (v, k) => new Date(`2019-01-01T${toTimeFragment(k)}:00.000Z`));
+const flexDates = Array.from({ length: DATA_POINTS }, (v, k) => new Date(`2019-01-01T${toTimeFragment(k)}:00.000Z`));
 
 const controlVariantData: ChartData.VariantData = {
     name: 'control',
@@ -86,7 +85,7 @@ function generateColorMap(names: string[]): Map<string, string> {
     return colorMap;
 }
 
-function generateNames(numVariants: number) : string[] {
+function generateNames(numVariants: number): string[] {
     if (numVariants < 1) {
         return [];
     }
@@ -101,20 +100,20 @@ function generateDates(numPoints: number): Date[] {
     if (numPoints < 1 || numPoints >= 3600) {
         return [];
     }
-    return Array.from({length: numPoints}, (_, k) => new Date(`2019-01-01T${toTimeFragment(k)}:00.000Z`));
+    return Array.from({ length: numPoints }, (_, k) => new Date(`2019-01-01T${toTimeFragment(k)}:00.000Z`));
 }
 
 function generateValues(numPoints: number, rangeMultiplier: number): number[] {
     if (numPoints < 1 || numPoints >= 3600) {
         return [];
     }
-    return Array.from({length: numPoints}, () => +(Math.random() * rangeMultiplier).toFixed(2));
+    return Array.from({ length: numPoints }, () => +(Math.random() * rangeMultiplier).toFixed(2));
 };
 
 export function generateDataSet(
     numVariants: number,
     numPoints: number,
-    rangeMultiplier: number) : [ChartData.MetricData, Map<string, string>] {
+    rangeMultiplier: number): [ChartData.MetricData, Map<string, string>] {
     const names = generateNames(numVariants);
     const dates = generateDates(numPoints);
     if (names.length === 0 || dates.length === 0) {

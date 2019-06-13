@@ -1,19 +1,5 @@
 import { ChartData } from "./types";
 
-const DATA_POINTS = 96;
-const valuesControl: number[] = Array.from({ length: DATA_POINTS }, () => +(Math.random() * 10).toFixed(2));
-const valuesTreatment: number[] = Array.from({ length: DATA_POINTS }, () => +(Math.random() * 10).toFixed(2));
-const valuesOtherTreatment: number[] = Array.from({ length: DATA_POINTS }, () => +(Math.random() * 10).toFixed(2));
-
-// function zip(dates: Date[], values: number[]): ChartData.VariantDataPoint[] {
-//     return dates.map((aVal, aInd) => {
-//         return {
-//             x: aVal,
-//             y: values[aInd]
-//         }
-//     });
-// }
-
 function numZip(dates: Date[], values: number[]): ChartData.VariantDataPoint[] {
     return dates.map((aVal, aInd) => {
         return {

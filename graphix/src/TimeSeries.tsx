@@ -9,6 +9,15 @@ const SLIGHT_FUZZ_SUFFIX = '77';
 const AXIS_FUZZ_SUFFIX = '33';
 const AXIS_FOCUS_SUFFIX = '55';
 
+const CROSSHAIR_STYLE = {
+    'color': 'black',
+    'textSize': '0.8em',
+    'text': {
+        'fontWeight': 120,
+        'fontSize': 8,
+    }
+}
+
 interface ChartProps {
     metricData: ChartData.MetricData;
     metricName: string;
@@ -49,11 +58,25 @@ function getStrokeWidth(hoveredTreatment: string | null, variantName: string): n
     return variantName === hoveredTreatment ? 3 : 1;
 }
 
-function setWithOpacity(colorString: string, isHovered: boolean, isAxis=false): string {
+function setWithOpacity(colorString: string, isHovered: boolean, isAxis = false): string {
     if (isAxis) {
         return isHovered ? `${colorString}${AXIS_FOCUS_SUFFIX}` : `${colorString}${AXIS_FUZZ_SUFFIX}`;
     }
     return isHovered ? `${colorString}` : `${colorString}${SLIGHT_FUZZ_SUFFIX}`;
+}
+
+function renderCrosshair(crosshairTarget: CrosshairTarget | null): React.ReactNode {
+    if (!crosshairTarget) {
+        return null;
+    }
+    return (
+        <Crosshair values={[crosshairTarget.targetPoint]}>
+            <div>
+                <p style={CROSSHAIR_STYLE}>{`Date: ${new Date(crosshairTarget.targetPoint.x).toLocaleString()}`}</p>
+                <p>{`Value: ${crosshairTarget.targetPoint.y.toFixed(2)}`}</p>
+            </div>
+        </Crosshair>
+    );
 }
 
 function createPlotDiv(
@@ -97,11 +120,6 @@ function createPlotDiv(
                 style={{ fill: 'none' }}
                 yDomain={[yDomain.lower, yDomain.upper]}
             >
-                {/* <DecorativeAxis
-                    axisStart={{x: xDomain.lower, y: 0}}
-                    axisEnd={{x: xDomain.upper, y: 0}}
-                    axisDoman={[xDomain.lower - 100000, xDomain.upper + 100000]}
-                /> */}
                 <YAxis
                     style={{
                         line: { stroke: setWithOpacity('#ADDDE1', isHovered) },
@@ -112,7 +130,7 @@ function createPlotDiv(
                 <XAxis
                     tickTotal={6}
                     style={{
-                        line: { stroke: setWithOpacity('#ADDDE1', isHovered, true) },
+                        line: { stroke: '#FFFFFF00' },
                         ticks: { stroke: setWithOpacity('#ADDDE1', isHovered) },
                         text: { stroke: 'none', fill: setWithOpacity('#6b6b76', isHovered), fontWeight: 300 }
                     }}
@@ -144,7 +162,7 @@ function createPlotDiv(
                     />
                 ))}
 
-                {crosshairTarget !== null && <Crosshair values={[crosshairTarget.targetPoint]} />}
+                {renderCrosshair(crosshairTarget)}
             </FlexibleWidthXYPlot>
             <div className="legendContainer">
                 <DiscreteColorLegend

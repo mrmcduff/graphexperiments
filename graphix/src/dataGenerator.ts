@@ -5,10 +5,19 @@ const valuesControl: number[] = Array.from({ length: DATA_POINTS }, () => +(Math
 const valuesTreatment: number[] = Array.from({ length: DATA_POINTS }, () => +(Math.random() * 10).toFixed(2));
 const valuesOtherTreatment: number[] = Array.from({ length: DATA_POINTS }, () => +(Math.random() * 10).toFixed(2));
 
-function zip(dates: Date[], values: number[]): ChartData.VariantDataPoint[] {
+// function zip(dates: Date[], values: number[]): ChartData.VariantDataPoint[] {
+//     return dates.map((aVal, aInd) => {
+//         return {
+//             x: aVal,
+//             y: values[aInd]
+//         }
+//     });
+// }
+
+function numZip(dates: Date[], values: number[]): ChartData.VariantDataPoint[] {
     return dates.map((aVal, aInd) => {
         return {
-            x: aVal,
+            x: aVal.getTime(),
             y: values[aInd]
         }
     });
@@ -24,34 +33,6 @@ function toTimeFragment(k: number): string {
     const minutesString = minutes < 10 ? `0${minutes}` : `${minutes}`;
     return `${hoursString}:${minutesString}`;
 }
-
-const flexDates = Array.from({ length: DATA_POINTS }, (v, k) => new Date(`2019-01-01T${toTimeFragment(k)}:00.000Z`));
-
-const controlVariantData: ChartData.VariantData = {
-    name: 'control',
-    data: zip(flexDates, valuesControl),
-}
-
-const treatmentVariantData: ChartData.VariantData = {
-    name: 'treatment',
-    data: zip(flexDates, valuesTreatment),
-}
-
-const otherTreatmentVariantData: ChartData.VariantData = {
-    name: 'treatment2',
-    data: zip(flexDates, valuesOtherTreatment),
-};
-
-export const SampleData: ChartData.MetricData = {
-    'control': controlVariantData,
-    'treatment': treatmentVariantData
-};
-
-export const SampleTriData: ChartData.MetricData = {
-    'control': controlVariantData,
-    'treatment': treatmentVariantData,
-    'treatment2': otherTreatmentVariantData,
-};
 
 export const colormap = new Map<string, string>();
 export const COLOR_ROSE = '#E281BF';
@@ -123,9 +104,48 @@ export function generateDataSet(
     names.forEach(name => {
         const variantData: ChartData.VariantData = {
             name,
-            data: zip(dates, generateValues(numPoints, rangeMultiplier)),
+            data: numZip(dates, generateValues(numPoints, rangeMultiplier)),
         }
         metricData[name] = variantData;
     });
     return [metricData, generateColorMap(names)];
+}
+
+function convertVariantDataToComparison(
+    original: ChartData.VariantData,
+    control: ChartData.VariantData): ChartData.VariantData {
+    if (original.data.length != control.data.length) {
+        console.error('Attempting to compare data of different lengths.');
+        return original;
+    }
+
+    const convertedData: ChartData.VariantData = {
+        name: original.name,
+        data: [],
+    };
+
+    convertedData.data = original.data.map((datum, idx) => {
+        return {
+            x: datum.x,
+            y: datum.y - control.data[idx].y
+        }
+    });
+
+    return convertedData;
+}
+
+export function convertToComparisonData(data: ChartData.MetricData): ChartData.MetricData {
+    const controlVariantData: ChartData.VariantData = data['control'];
+    if (!controlVariantData) {
+        return data;
+    }
+    const convertedData: ChartData.MetricData = {};
+    Object.keys(data).forEach(key => {
+        if (key === 'control') {
+            return;
+        }
+        const originalVariantData = data[key];
+        convertedData[key] = convertVariantDataToComparison(originalVariantData, controlVariantData);
+    });
+    return convertedData;
 }

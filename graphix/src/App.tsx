@@ -2,29 +2,30 @@ import React from 'react';
 import './App.css';
 import '../node_modules/react-vis/dist/style.css';
 import { TimeSeries } from './TimeSeries';
-import { generateDataSet } from 'dataGenerator';
+import { generateDataSet, convertToComparisonData } from 'dataGenerator';
 
 const App: React.FC = () => {
     const [twoMetricData, twoColorMap] = generateDataSet(2, 96, 6);
-    const [threeMetricData, threeColorMap] = generateDataSet(3, 128, 1);
-    const [sixMetricData, sixColorMap] = generateDataSet(6, 64, 3);
+    const [anotherGrouping, anotherColorMap] = generateDataSet(2, 64, 2);
+    const [narrowGrouping, narrowColorMap] = generateDataSet(2, 32, 1);
+
     return (
         <div className="App">
             <div className='leftPanel'>
                 <TimeSeries
-                    metricData={twoMetricData}
+                    metricData={convertToComparisonData(twoMetricData)}
                     metricName='things_per_second'
                     colorMap={twoColorMap}
                 />
                 <TimeSeries
-                    metricData={threeMetricData}
+                    metricData={convertToComparisonData(anotherGrouping)}
                     metricName='more_things_per_second'
-                    colorMap={threeColorMap}
+                    colorMap={anotherColorMap}
                 />
                 <TimeSeries
-                    metricData={sixMetricData}
+                    metricData={convertToComparisonData(narrowGrouping)}
                     metricName='more_things_per_second'
-                    colorMap={sixColorMap}
+                    colorMap={narrowColorMap}
                 />
             </div>
         </div>

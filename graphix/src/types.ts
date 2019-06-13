@@ -7,7 +7,12 @@ export namespace ChartData {
         data: VariantDataPoint[];
     }
     export interface VariantDataPoint {
-        x: Date;
+        x: number;
         y: number;
     }
+}
+
+export interface GraphDomain {
+    upper: number;
+    lower: number;
 }

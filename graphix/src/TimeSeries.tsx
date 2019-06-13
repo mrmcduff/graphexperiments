@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { Crosshair, DiscreteColorLegend, FlexibleWidthXYPlot, LineMarkSeries, YAxis, XAxis } from 'react-vis';
+import { Crosshair, DiscreteColorLegend, DecorativeAxis, FlexibleWidthXYPlot, LineSeries, YAxis, XAxis } from 'react-vis';
 import { ChartData } from './types';
+import { getYDomain, getXDomain } from 'dataHelpers';
 
-const CHART_HEIGHT = 256;
+const CHART_HEIGHT = 128;
 const CHART_MARGIN = 36;
 const SLIGHT_FUZZ_SUFFIX = '77';
+const AXIS_FUZZ_SUFFIX = '33';
+const AXIS_FOCUS_SUFFIX = '55';
 
 interface ChartProps {
     metricData: ChartData.MetricData;
@@ -46,7 +49,10 @@ function getStrokeWidth(hoveredTreatment: string | null, variantName: string): n
     return variantName === hoveredTreatment ? 3 : 1;
 }
 
-function setWithOpacity(colorString: string, isHovered: boolean): string {
+function setWithOpacity(colorString: string, isHovered: boolean, isAxis=false): string {
+    if (isAxis) {
+        return isHovered ? `${colorString}${AXIS_FOCUS_SUFFIX}` : `${colorString}${AXIS_FUZZ_SUFFIX}`;
+    }
     return isHovered ? `${colorString}` : `${colorString}${SLIGHT_FUZZ_SUFFIX}`;
 }
 
@@ -67,6 +73,13 @@ function createPlotDiv(
         title: variantName,
         color: colorMap.get(variantName)!,
     }));
+    const rangeData = metricData[knownVariantSeries[0]];
+    const yDomain = getYDomain(0.5, rangeData.data);
+    const xDomain = getXDomain(0.2, rangeData.data);
+    const axisDataset = rangeData.data.map(datum => ({
+        x: datum.x,
+        y: 0,
+    }));
     return (
         <div
             key={`container-${metricName}`}
@@ -82,9 +95,14 @@ function createPlotDiv(
                 margin={CHART_MARGIN}
                 key={`plot-${metricName}`}
                 style={{ fill: 'none' }}
+                yDomain={[yDomain.lower, yDomain.upper]}
             >
+                {/* <DecorativeAxis
+                    axisStart={{x: xDomain.lower, y: 0}}
+                    axisEnd={{x: xDomain.upper, y: 0}}
+                    axisDoman={[xDomain.lower - 100000, xDomain.upper + 100000]}
+                /> */}
                 <YAxis
-                    tickTotal={6}
                     style={{
                         line: { stroke: setWithOpacity('#ADDDE1', isHovered) },
                         ticks: { stroke: setWithOpacity('#ADDDE1', isHovered) },
@@ -94,15 +112,21 @@ function createPlotDiv(
                 <XAxis
                     tickTotal={6}
                     style={{
-                        line: { stroke: setWithOpacity('#ADDDE1', isHovered) },
+                        line: { stroke: setWithOpacity('#ADDDE1', isHovered, true) },
                         ticks: { stroke: setWithOpacity('#ADDDE1', isHovered) },
                         text: { stroke: 'none', fill: setWithOpacity('#6b6b76', isHovered), fontWeight: 300 }
                     }}
                 />
+                <LineSeries
+                    key={`axis-${metricName}`}
+                    data={axisDataset}
+                    color={setWithOpacity('#ADDDE1', isHovered, true)}
+                    strokeWidth={2}
+                />
                 {knownVariantSeries.map((variantName, seriesIndex) => (
-                    <LineMarkSeries
-                        size={2}
+                    <LineSeries
                         key={`${metricName}-${variantName}`}
+                        curve="curveMonotoneX"
                         data={metricData[variantName].data}
                         color={setWithOpacity(colorMap.get(variantName)!, isHovered)}
                         getNull={checkNaNs}
@@ -119,6 +143,7 @@ function createPlotDiv(
                         }}
                     />
                 ))}
+
                 {crosshairTarget !== null && <Crosshair values={[crosshairTarget.targetPoint]} />}
             </FlexibleWidthXYPlot>
             <div className="legendContainer">

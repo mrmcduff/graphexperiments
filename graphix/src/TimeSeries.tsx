@@ -10,8 +10,12 @@ const AXIS_FUZZ_SUFFIX = '33';
 const AXIS_FOCUS_SUFFIX = '55';
 
 const CROSSHAIR_STYLE = {
-    'color': 'black',
-    'textSize': '0.8em',
+    'color': 'white',
+    'font-size': '0.8em',
+    'backgroundColor': '#000000BB',
+    'border-radius': '5px',
+    'width': '96px',
+    'padding': '3px',
     'text': {
         'fontWeight': 120,
         'fontSize': 8,
@@ -71,9 +75,9 @@ function renderCrosshair(crosshairTarget: CrosshairTarget | null): React.ReactNo
     }
     return (
         <Crosshair values={[crosshairTarget.targetPoint]}>
-            <div>
-                <p style={CROSSHAIR_STYLE}>{`Date: ${new Date(crosshairTarget.targetPoint.x).toLocaleString()}`}</p>
-                <p>{`Value: ${crosshairTarget.targetPoint.y.toFixed(2)}`}</p>
+            <div style={CROSSHAIR_STYLE}>
+                {`Date: ${new Date(crosshairTarget.targetPoint.x).toLocaleTimeString()}`}<br />
+                {`Value: ${crosshairTarget.targetPoint.y.toFixed(2)}`}
             </div>
         </Crosshair>
     );
@@ -121,6 +125,7 @@ function createPlotDiv(
                 yDomain={[yDomain.lower, yDomain.upper]}
             >
                 <YAxis
+                    tickTotal={4}
                     style={{
                         line: { stroke: setWithOpacity('#ADDDE1', isHovered) },
                         ticks: { stroke: setWithOpacity('#ADDDE1', isHovered) },
